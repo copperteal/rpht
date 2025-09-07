@@ -1,0 +1,94 @@
+# -*- mode: Org -*-
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted.
+# 
+# THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+# OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+# CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+# 
+#+TITLE: Readably Printable Hash-Tables for Common Lisp
+#+AUTHOR: J. David Taylor
+
+* Summary
+Readable hash-table literals are delimited by ~#H(~ and ~)~ with the following
+macro lambda list:
+#+BEGIN_SRC lisp
+  &OPTIONAL ALIST &KEY TEST SIZE REHASH-SIZE REHASH-THRESHOLD &ALLOW-OTHER-KEYS
+#+END_SRC
+~ALIST~ must be an association list literal of the hash-table's initial
+key-value pairs.  All keyword arguments of ~CL:MAKE-HASH-TABLE~ are valid.  In
+particular, implementation-dependent keyword arguments of ~CL:MAKE-HASH-TABLE~
+may be used, though they are not (yet) preserved in the hash-table's printed
+representation.
+
+Hash-tables print readably when ~RPHT:*READABLE-HASH-TABLES*~ or
+~CL:*PRINT-READABLY*~ is true, otherwise hash-tables will print unreadably.
+~RPHT:*READABLE-HASH-TABLES*~ is initially ~T~.
+
+* Usage Example
+The symbol ~ID~ is used for implementation-dependent values:
+#+BEGIN_SRC lisp
+  CL-USER> (asdf:load-system "rpht")
+
+  CL-USER> (make-hash-table)
+  => #H(NIL :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> #h()
+  => #H(NIL :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> (let ((ht (make-hash-table :test 'eq)))
+             (setf (gethash 'foo ht) 'bar)
+             ht)
+  => #H(((FOO . BAR)) :TEST EQ :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> #h(((foo . bar)) :test eq)
+  => #H(((FOO . BAR)) :TEST EQ :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> (let ((ht (make-hash-table :test 'equal)))
+             (setf (gethash "world" ht) 1
+                   (gethash "hello" ht) 0)
+             ht)
+  => #H((("hello" . 0) ("world" . 1)) :TEST EQUAL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> #h((("hello" . 0) ("world" . 1)) :test equal)
+  => #H((("hello" . 0) ("world" . 1)) :TEST EQUAL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+
+  CL-USER> (setq rpht:*readable-hash-tables* nil)
+  => NIL
+
+  CL-USER> (let ((ht (make-hash-table :test 'equal)))
+             (setf (gethash "world" ht) 1
+                   (gethash "hello" ht) 0)
+             ht)
+  => #<HASH-TABLE :TEST EQUAL :COUNT 2 ID>
+
+  CL-USER> #h((("hello" . 0) ("world" . 1)) :test equal)
+  => #<HASH-TABLE :TEST EQUAL :COUNT 2 ID>
+
+  CL-USER> (defvar *ht* #h())
+  => *HT*
+
+  CL-USER> (setf (gethash 'foo *ht*) 'bar
+                 (gethash 'baz *ht*) 'quux
+                 (gethash 'thwop *ht*) 'twiddle)
+  => TWIDDLE
+
+  CL-USER> *ht*
+  => #<HASH-TABLE :TEST EQL :COUNT 3 ID>
+
+  CL-USER> (setq rpht:*readable-hash-tables* t)
+  => T
+
+  CL-USER> *ht*
+  => #H(((THWOP . TWIDDLE) (BAZ . QUUX) (FOO . BAR)) :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
+#+END_SRC
+
+* Bugs
+Printer control variables may be ignored.
+
+Any deviations from the ANSI standard are bugs.  Corrections and contributions
+are welcome.

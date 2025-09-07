@@ -1,0 +1,7 @@
+# -*- mode: Org -*-
+#+TITLE: TODO
+#+AUTHOR: J. David Taylor
+
+- [ ] Ensure [[https://www.lispworks.com/documentation/HyperSpec/Body/f_pr_obj.htm][printer control variable]] semantics are honored
+- [ ] Add support for implementation-dependent keywords.
+- [ ] Profiling and type declarations
