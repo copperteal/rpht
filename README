@@ -34,12 +34,15 @@ The symbol ~ID~ is used for implementation-dependent values:
 #+BEGIN_SRC lisp
   CL-USER> (asdf:load-system "rpht")
 
+  ;;; hash tables print readably after system load
   CL-USER> (make-hash-table)
   => #H(NIL :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
 
+  ;;; hash table literals are written with #h(...) notation
   CL-USER> #h()
   => #H(NIL :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
 
+  ;;; three lines of initialization can be replaced with a one-liner
   CL-USER> (let ((ht (make-hash-table :test 'eq)))
              (setf (gethash 'foo ht) 'bar)
              ht)
@@ -48,6 +51,7 @@ The symbol ~ID~ is used for implementation-dependent values:
   CL-USER> #h(((foo . bar)) :test eq)
   => #H(((FOO . BAR)) :TEST EQ :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
 
+  ;;; a similar example
   CL-USER> (let ((ht (make-hash-table :test 'equal)))
              (setf (gethash "world" ht) 1
                    (gethash "hello" ht) 0)
@@ -57,9 +61,11 @@ The symbol ~ID~ is used for implementation-dependent values:
   CL-USER> #h((("hello" . 0) ("world" . 1)) :test equal)
   => #H((("hello" . 0) ("world" . 1)) :TEST EQUAL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
 
+  ;;; disable readable printing
   CL-USER> (setq rpht:*readable-hash-tables* nil)
   => NIL
 
+  ;;; hash tables no longer print readably
   CL-USER> (let ((ht (make-hash-table :test 'equal)))
              (setf (gethash "world" ht) 1
                    (gethash "hello" ht) 0)
@@ -80,9 +86,11 @@ The symbol ~ID~ is used for implementation-dependent values:
   CL-USER> *ht*
   => #<HASH-TABLE :TEST EQL :COUNT 3 ID>
 
+  ;;; enable readable printing
   CL-USER> (setq rpht:*readable-hash-tables* t)
   => T
 
+  ;;; hash table prints readably
   CL-USER> *ht*
   => #H(((THWOP . TWIDDLE) (BAZ . QUUX) (FOO . BAR)) :TEST EQL :SIZE ID :REHASH-SIZE ID :REHASH-THRESHOLD ID)
 #+END_SRC
